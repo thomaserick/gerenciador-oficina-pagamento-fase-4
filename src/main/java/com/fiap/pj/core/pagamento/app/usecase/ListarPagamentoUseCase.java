@@ -1,7 +1,7 @@
 package com.fiap.pj.core.pagamento.app.usecase;
 
-import com.fiap.pj.infra.servico.controller.request.ListarPagamentoRequest;
-import com.fiap.pj.infra.servico.controller.response.PagamentoResponse;
+import com.fiap.pj.infra.pagamento.controller.request.ListarPagamentoRequest;
+import com.fiap.pj.infra.pagamento.controller.response.PagamentoResponse;
 
 public interface ListarPagamentoUseCase {
 

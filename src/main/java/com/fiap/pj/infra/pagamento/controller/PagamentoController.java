@@ -1,9 +1,9 @@
-package com.fiap.pj.infra.servico.controller;
+package com.fiap.pj.infra.pagamento.controller;
 
 import com.fiap.pj.core.pagamento.app.usecase.ListarPagamentoUseCase;
-import com.fiap.pj.infra.servico.controller.openapi.PagamentoControllerOpenApi;
-import com.fiap.pj.infra.servico.controller.request.ListarPagamentoRequest;
-import com.fiap.pj.infra.servico.controller.response.PagamentoResponse;
+import com.fiap.pj.infra.pagamento.controller.openapi.PagamentoControllerOpenApi;
+import com.fiap.pj.infra.pagamento.controller.request.ListarPagamentoRequest;
+import com.fiap.pj.infra.pagamento.controller.response.PagamentoResponse;
 import lombok.AllArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.GetMapping;

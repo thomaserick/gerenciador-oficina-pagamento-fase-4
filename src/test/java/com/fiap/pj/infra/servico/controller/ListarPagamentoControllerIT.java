@@ -2,6 +2,7 @@ package com.fiap.pj.infra.servico.controller;
 
 
 import com.fiap.pj.core.util.TestUtils;
+import com.fiap.pj.infra.pagamento.controller.PagamentoController;
 import com.fiap.pj.util.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

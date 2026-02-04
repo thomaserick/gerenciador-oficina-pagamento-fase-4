@@ -1,4 +1,4 @@
-package com.fiap.pj.infra.servico.controller.response;
+package com.fiap.pj.infra.pagamento.controller.response;
 
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

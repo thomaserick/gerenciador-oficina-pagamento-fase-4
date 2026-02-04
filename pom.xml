@@ -42,6 +42,7 @@
         <sonarsource.version>3.10.0.2594</sonarsource.version>
         <newrelic.version>8.25.0</newrelic.version>
         <logback-enconder.version>7.4</logback-enconder.version>
+        <awspring.cloud.version>3.0.1</awspring.cloud.version>
 
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -54,6 +55,19 @@
         <sonar.coverage.exclusions>**/infra/**,**/*Exceptions.java,**/*Utils,**/*RepositoryJpa.java
         </sonar.coverage.exclusions>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.awspring.cloud</groupId>
+                <artifactId>spring-cloud-aws-dependencies</artifactId>
+                <version>${awspring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
     <dependencies>
         <dependency>
@@ -75,6 +89,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-starter-dynamodb</artifactId>
         </dependency>
 
 

@@ -1,4 +1,4 @@
-package com.fiap.pj.infra.servico.controller.request;
+package com.fiap.pj.infra.pagamento.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
