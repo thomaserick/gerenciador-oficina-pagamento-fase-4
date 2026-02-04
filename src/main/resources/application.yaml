@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: gerenciador-oficina-pagamento
+
+  jackson:
+    time-zone: UTC
+
+  data:
+    web:
+      sort:
+        sort-parameter: order
+      pageable:
+        page-parameter: page
+        one-indexed-parameters: true
+        size-parameter: pageSize
+        max-page-size: 50
+        default-page-size: 10
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration
+      - org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration
+
+  rabbitmq:
+    addresses: amqps://qvmoypwp:svWftB5y5T6iGqSHLCXLh9Zu51OhaTri@moose.rmq.cloudamqp.com/qvmoypwp
+
+springdoc:
+  default-produces-media-type: application/json
+  api-docs:
+    path: /swagger-ui/v3/api-docs
+  swagger-ui:
+    title: Gerenciador de Oficina Pagamentos API
+    doc-expansion: none
+    display-request-duration: true
+    groups-order: DESC
+    operationsSorter: alpha
+    tagsSorter: alpha
+    disable-swagger-default-url: true
+    path: /swagger-ui
+  group-configs:
+    - group: v1 - api
+      paths-to-match: /v1/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  metrics:
+    enable:
+      process: false
+      system: false
+  endpoint:
+    metrics:
+      enabled: false
+    health:
+      probes:
+        enabled: true
+
+broker:
+  queue:
+    email: default.pagamento
+
+
+server:
+  port: 8083

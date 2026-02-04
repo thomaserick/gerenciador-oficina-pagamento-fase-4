@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gerenciador-oficina-pagmento-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: gerenciador-oficina-pagamento-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8083
