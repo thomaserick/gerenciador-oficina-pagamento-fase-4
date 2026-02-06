@@ -21,7 +21,6 @@ public class Pagamento {
     private MetodoPagamento metodoPagamento;
     private Integer quantidadeParcelas;
     private StatusPagamento statusPagamento;
-    private String pagamentoExternoId;
     private String transacaoId;
     private String codigoAutorizacao;
     private String codigoErro;
@@ -32,6 +31,5 @@ public class Pagamento {
     private String dataExpiracao;
     private String chaveIdempotencia;
     private String criadoPor;
-
 
 }

@@ -60,7 +60,8 @@ management:
 
 broker:
   queue:
-    email: default.pagamento
+    pagamento: default.pagamento
+    pagamento-processar: default.pagamento.processar
 
 
 server:

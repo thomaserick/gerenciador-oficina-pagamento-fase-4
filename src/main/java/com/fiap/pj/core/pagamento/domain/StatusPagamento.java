@@ -3,8 +3,7 @@ package com.fiap.pj.core.pagamento.domain;
 public enum StatusPagamento {
     PENDENTE,
     AUTORIZADO,
-    PAGO,
-    FALHOU,
+    NAO_AUTORIZADO,
     CANCELADO,
     ESTORNADO
 }

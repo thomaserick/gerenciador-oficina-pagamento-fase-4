@@ -14,11 +14,19 @@ public class RabbitMQConfig {
 
 
     @Value("${broker.queue.pagamento}")
-    private String queue;
+    private String queuePagamento;
 
     @Bean
-    public Queue queue() {
-        return new Queue(queue, true);
+    public Queue queuePagamento() {
+        return new Queue(queuePagamento, true);
+    }
+
+    @Value("${broker.queue.pagamento-processar}")
+    private String queueProcessarPagamento;
+
+    @Bean
+    public Queue queueProcessarPagamento() {
+        return new Queue(queueProcessarPagamento, true);
     }
 
     @Bean

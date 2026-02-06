@@ -1,17 +1,23 @@
 package com.fiap.pj.infra.pagamento.persistense;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 import java.math.BigDecimal;
 
 
 @DynamoDbBean
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PagamentoEntity {
 
     private String pagamentoId;
@@ -43,16 +49,17 @@ public class PagamentoEntity {
     private String chaveIdempotencia;
     private String criadoPor;
 
+    @DynamoDbSortKey
+    @DynamoDbAttribute("ordem_servico_id")
+
+    public String getOrdemServicoId() {
+        return ordemServicoId;
+    }
+
     @DynamoDbPartitionKey
     @DynamoDbAttribute("pagamento_id")
     public String getPagamentoId() {
         return pagamentoId;
-    }
-
-    @DynamoDbAttribute("ordem_servico_id")
-    @DynamoDbSecondaryPartitionKey(indexNames = "ordemServico-index")
-    public String getOrdemServicoId() {
-        return ordemServicoId;
     }
 
     @DynamoDbAttribute("cliente_id")

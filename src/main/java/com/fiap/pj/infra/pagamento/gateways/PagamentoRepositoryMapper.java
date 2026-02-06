@@ -10,62 +10,50 @@ import lombok.experimental.UtilityClass;
 public class PagamentoRepositoryMapper {
 
     public static PagamentoEntity toEntity(Pagamento pagamento) {
-        if (pagamento == null) return null;
-        PagamentoEntity entity = new PagamentoEntity();
-        entity.setPagamentoId(pagamento.getPagamentoId());
-        entity.setOrdemServicoId(pagamento.getOrdemServicoId());
-        entity.setClienteId(pagamento.getClienteId());
-        entity.setValor(pagamento.getValor());
-        entity.setDesconto(pagamento.getDesconto());
-        entity.setValorTotal(pagamento.getValorTotal());
-        entity.setMetodoPagamento(
-                pagamento.getMetodoPagamento().name()
-        );
-        entity.setQuantidadeParcelas(pagamento.getQuantidadeParcelas());
-        entity.setStatusPagamento(
-                pagamento.getStatusPagamento().name()
-        );
-        entity.setPagamentoExternoId(pagamento.getPagamentoExternoId());
-        entity.setTransacaoId(pagamento.getTransacaoId());
-        entity.setCodigoAutorizacao(pagamento.getCodigoAutorizacao());
-        entity.setCodigoErro(pagamento.getCodigoErro());
-        entity.setMensagemErro(pagamento.getMensagemErro());
-        entity.setDataCriacao(pagamento.getDataCriacao());
-        entity.setDataAtualizacao(pagamento.getDataAtualizacao());
-        entity.setDataPagamento(pagamento.getDataPagamento());
-        entity.setDataExpiracao(pagamento.getDataExpiracao());
-        entity.setChaveIdempotencia(pagamento.getChaveIdempotencia());
-        entity.setCriadoPor(pagamento.getCriadoPor());
-        return entity;
+        return PagamentoEntity.builder()
+                .pagamentoId(pagamento.getPagamentoId())
+                .ordemServicoId(pagamento.getOrdemServicoId())
+                .clienteId(pagamento.getClienteId())
+                .valor(pagamento.getValor())
+                .desconto(pagamento.getDesconto())
+                .valorTotal(pagamento.getValorTotal())
+                .metodoPagamento(pagamento.getMetodoPagamento().name())
+                .quantidadeParcelas(pagamento.getQuantidadeParcelas())
+                .statusPagamento(pagamento.getStatusPagamento().name())
+                .transacaoId(pagamento.getTransacaoId())
+                .codigoAutorizacao(pagamento.getCodigoAutorizacao())
+                .codigoErro(pagamento.getCodigoErro())
+                .mensagemErro(pagamento.getMensagemErro())
+                .dataCriacao(pagamento.getDataCriacao())
+                .dataAtualizacao(pagamento.getDataAtualizacao())
+                .dataPagamento(pagamento.getDataPagamento())
+                .dataExpiracao(pagamento.getDataExpiracao())
+                .chaveIdempotencia(pagamento.getChaveIdempotencia())
+                .criadoPor(pagamento.getCriadoPor())
+                .build();
     }
 
     public static Pagamento toDomain(PagamentoEntity entity) {
-        if (entity == null) return null;
-        Pagamento pagamento = new Pagamento();
-        pagamento.setPagamentoId(entity.getPagamentoId());
-        pagamento.setOrdemServicoId(entity.getOrdemServicoId());
-        pagamento.setClienteId(entity.getClienteId());
-        pagamento.setValor(entity.getValor());
-        pagamento.setDesconto(entity.getDesconto());
-        pagamento.setValorTotal(entity.getValorTotal());
-        pagamento.setMetodoPagamento(
-                MetodoPagamento.valueOf(entity.getMetodoPagamento())
-        );
-        pagamento.setQuantidadeParcelas(entity.getQuantidadeParcelas());
-        pagamento.setStatusPagamento(
-                StatusPagamento.valueOf(entity.getStatusPagamento())
-        );
-        pagamento.setPagamentoExternoId(entity.getPagamentoExternoId());
-        pagamento.setTransacaoId(entity.getTransacaoId());
-        pagamento.setCodigoAutorizacao(entity.getCodigoAutorizacao());
-        pagamento.setCodigoErro(entity.getCodigoErro());
-        pagamento.setMensagemErro(entity.getMensagemErro());
-        pagamento.setDataCriacao(entity.getDataCriacao());
-        pagamento.setDataAtualizacao(entity.getDataAtualizacao());
-        pagamento.setDataPagamento(entity.getDataPagamento());
-        pagamento.setDataExpiracao(entity.getDataExpiracao());
-        pagamento.setChaveIdempotencia(entity.getChaveIdempotencia());
-        pagamento.setCriadoPor(entity.getCriadoPor());
-        return pagamento;
+        return Pagamento.builder()
+                .pagamentoId(entity.getPagamentoId())
+                .ordemServicoId(entity.getOrdemServicoId())
+                .clienteId(entity.getClienteId())
+                .valor(entity.getValor())
+                .desconto(entity.getDesconto())
+                .valorTotal(entity.getValorTotal())
+                .metodoPagamento(MetodoPagamento.valueOf(entity.getMetodoPagamento()))
+                .quantidadeParcelas(entity.getQuantidadeParcelas())
+                .statusPagamento(StatusPagamento.valueOf(entity.getStatusPagamento()))
+                .transacaoId(entity.getTransacaoId())
+                .codigoAutorizacao(entity.getCodigoAutorizacao())
+                .codigoErro(entity.getCodigoErro())
+                .mensagemErro(entity.getMensagemErro())
+                .dataCriacao(entity.getDataCriacao())
+                .dataAtualizacao(entity.getDataAtualizacao())
+                .dataPagamento(entity.getDataPagamento())
+                .dataExpiracao(entity.getDataExpiracao())
+                .chaveIdempotencia(entity.getChaveIdempotencia())
+                .criadoPor(entity.getCriadoPor())
+                .build();
     }
 }

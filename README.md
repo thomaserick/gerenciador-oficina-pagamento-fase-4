@@ -188,6 +188,38 @@ devops/
 
 O sistema rodará na porta `localhost:8083`.
 
+#### Teste local com RabbitMQ
+
+Para testar localmente com RabbitMQ, siga os passos abaixo:
+
+1. Certifique-se de ter o RabbitMQ instalado e em execução localmente.
+2. Configure as propriedades de conexão do RabbitMQ no arquivo `application-dev.yaml`:
+3. ```yaml
+   spring:
+     rabbitmq:
+       host: localhost
+       port: 5672
+       username: seu_usuario
+       password: sua_senha
+   ```
+4. Inicie a aplicação. Ela se conectará ao RabbitMQ local para enviar e receber mensagens.
+5. Utilize uma ferramenta como o RabbitMQ Management UI para monitorar as filas e mensagens.
+6. Envie mensagens de teste para as filas configuradas e verifique se a aplicação as processa corretamente.
+7. Ex de mensagem para processar pagamento:
+
+```json
+{
+  "ordemServicoId": "OS-2026-000123",
+  "clienteId": "CLI-984512",
+  "valor": 1500.00,
+  "desconto": 100.00,
+  "valorTotal": 1400.00,
+  "metodoPagamento": "CARTAO_CREDITO",
+  "quantidadeParcelas": 3,
+  "responasvel": "Thomas Erick"
+}
+```
+
 ## 🔗 Repositórios Relacionados — Fase 4
 
 A arquitetura do **Gerenciador de Oficina — Fase 3** é composta por múltiplos módulos independentes, cada um versionado

@@ -10,5 +10,6 @@ public record ProcessarPagamentoMessage(String ordemServicoId,
                                         BigDecimal desconto,
                                         BigDecimal valorTotal,
                                         MetodoPagamento metodoPagamento,
-                                        Integer quantidadeParcelas) {
+                                        Integer quantidadeParcelas,
+                                        String responsavel) {
 }

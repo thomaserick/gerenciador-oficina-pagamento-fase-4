@@ -18,7 +18,7 @@ public class PagamentoConsumer {
     @RabbitListener(queues = "${broker.queue.pagamento}")
     public void receiveMessage(ProcessarPagamentoMessage message) {
         var cmd = new ProcessarPagamentoCommand(message.ordemServicoId(), message.clienteId(), message.valor(),
-                message.desconto(), message.valorTotal(), message.metodoPagamento(), message.quantidadeParcelas());
+                message.desconto(), message.valorTotal(), message.metodoPagamento(), message.quantidadeParcelas(), message.responsavel());
         processarPagamentoUseCase.handle(cmd);
     }
 }

@@ -1,11 +1,13 @@
 package com.fiap.pj.core.pagamento.app.usecase.command;
 
 import com.fiap.pj.core.pagamento.domain.MetodoPagamento;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
+@AllArgsConstructor
 public class ProcessarPagamentoCommand {
 
     private final String ordemServicoId;
@@ -15,16 +17,8 @@ public class ProcessarPagamentoCommand {
     private final BigDecimal valorTotal;
     private final MetodoPagamento metodoPagamento;
     private final Integer quantidadeParcelas;
+    private final String responsavel;
 
-    public ProcessarPagamentoCommand(String ordemServicoId, String clienteId, BigDecimal valor, BigDecimal desconto, BigDecimal valorTotal, MetodoPagamento metodoPagamento, Integer quantidadeParcelas) {
-        this.ordemServicoId = ordemServicoId;
-        this.clienteId = clienteId;
-        this.valor = valor;
-        this.desconto = desconto;
-        this.valorTotal = valorTotal;
-        this.metodoPagamento = metodoPagamento;
-        this.quantidadeParcelas = quantidadeParcelas;
-    }
 }
 
 

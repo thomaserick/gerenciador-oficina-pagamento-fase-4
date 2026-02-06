@@ -10,6 +10,7 @@ import com.fiap.pj.infra.pagamento.controller.response.PagamentoResponse;
 public class ListarPagamentoUseCaseImpl implements ListarPagamentoUseCase {
 
     private final PagamentoGateway pagamentoGateway;
+    
 
     public ListarPagamentoUseCaseImpl(PagamentoGateway pagamentoGateway) {
         this.pagamentoGateway = pagamentoGateway;
