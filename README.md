@@ -54,7 +54,7 @@ A pipeline utiliza as seguintes variáveis de ambiente armazenadas como Secrets 
 | SONAR_TOKEN           | Token de autenticação para o SonarQube |
 | DOCKERHUB_USERNAME    | Nome de usuário do Docker Hub          |
 | DOCKERHUB_TOKEN       | Token de acesso do Docker Hub          |
-| AWS_ACCESS_KEY_ID_    | Chave de acesso AWS                    |
+| AWS_ACCESS_KEY_ID     | Chave de acesso AWS                    |
 | AWS_SECRET_ACCESS_KEY | Chave secreta AWS                      |
 | NEW_RELIC_API_KEY     | Chave de API do New Relic              |
 
