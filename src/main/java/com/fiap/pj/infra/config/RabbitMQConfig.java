@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
 
-    @Value("${broker.queue.pagamento}")
+    @Value("${broker.queue.pagamento.autorizado}")
     private String queuePagamento;
 
     @Bean
@@ -21,7 +21,7 @@ public class RabbitMQConfig {
         return new Queue(queuePagamento, true);
     }
 
-    @Value("${broker.queue.pagamento-processar}")
+    @Value("${broker.queue.pagamento.processar}")
     private String queueProcessarPagamento;
 
     @Bean

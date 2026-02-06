@@ -13,7 +13,7 @@ public class PagamentoPublisherGatewayImpl implements PagamentoPublisherGateway 
 
     final RabbitTemplate rabbitTemplate;
 
-    @Value("${broker.queue.pagamento-processar}")
+    @Value("${broker.queue.pagamento.autorizado}")
     private String routingKey;
 
     public PagamentoPublisherGatewayImpl(RabbitTemplate rabbitTemplate) {

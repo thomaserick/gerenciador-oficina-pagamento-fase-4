@@ -60,8 +60,9 @@ management:
 
 broker:
   queue:
-    pagamento: default.pagamento
-    pagamento-processar: default.pagamento.processar
+    pagamento:
+      autorizado: default.pagamento.autorizado
+      processar: default.pagamento.processar
 
 
 server:
