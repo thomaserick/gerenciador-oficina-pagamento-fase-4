@@ -31,7 +31,6 @@ public class PagamentoEntity {
     private String statusPagamento;
 
     // Integração externa
-    private String pagamentoExternoId;
     private String transacaoId;
     private String codigoAutorizacao;
 
@@ -49,14 +48,14 @@ public class PagamentoEntity {
     private String chaveIdempotencia;
     private String criadoPor;
 
-    @DynamoDbSortKey
-    @DynamoDbAttribute("ordem_servico_id")
 
+    @DynamoDbPartitionKey
+    @DynamoDbAttribute("ordem_servico_id")
     public String getOrdemServicoId() {
         return ordemServicoId;
     }
 
-    @DynamoDbPartitionKey
+    @DynamoDbSortKey
     @DynamoDbAttribute("pagamento_id")
     public String getPagamentoId() {
         return pagamentoId;
@@ -95,11 +94,6 @@ public class PagamentoEntity {
     @DynamoDbAttribute("status_pagamento")
     public String getStatusPagamento() {
         return statusPagamento;
-    }
-
-    @DynamoDbAttribute("pagamento_externo_id")
-    public String getPagamentoExternoId() {
-        return pagamentoExternoId;
     }
 
     @DynamoDbAttribute("transacao_id")

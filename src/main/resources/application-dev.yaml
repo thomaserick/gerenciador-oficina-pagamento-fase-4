@@ -1,2 +1,7 @@
-spring:
+aws:
+  dynamodb:
+    endpoint: http://localhost:4566
+
+
+
 

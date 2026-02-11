@@ -24,6 +24,12 @@ spring:
 
   rabbitmq:
     addresses: amqps://qvmoypwp:svWftB5y5T6iGqSHLCXLh9Zu51OhaTri@moose.rmq.cloudamqp.com/qvmoypwp
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+        default-requeue-rejected: false
 
 springdoc:
   default-produces-media-type: application/json
