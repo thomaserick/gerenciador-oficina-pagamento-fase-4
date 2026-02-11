@@ -142,14 +142,6 @@ jobs:
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --region ${{env.AWS_REGION}} --name ${{ env.CLUSTER_NAME }}
 
-      - name: Atualizar e aplicar ConfigMap com endpoint do RDS
-        run: |
-          RDS_ENDPOINT=$(aws rds describe-db-instances \
-            --db-instance-identifier ${{ env.RDS_DB_NAME }} \
-            --query "DBInstances[0].Endpoint.Address" \
-            --output text)
-          sed -i "s|{{RDS_ENDPOINT}}|$RDS_ENDPOINT|g" ./devops/k8s/prod/configmap.yaml
-
       - name: Substituir variáveis do Secret SMTP
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
