@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PagamentoRealizadoEventTest {
+class PagamentoAutorizadoEventTest {
 
     @Test
     @DisplayName("Deve criar PagamentoRealizadoEvent com ordemServicoId correto")
     void deveCriarPagamentoRealizadoEvent() {
         String ordemServicoId = "os-123";
 
-        PagamentoRealizadoEvent event = new PagamentoRealizadoEvent(ordemServicoId);
+        PagamentoEvent event = new PagamentoEvent(ordemServicoId);
 
         assertThat(event.ordemServicoId()).isEqualTo(ordemServicoId);
     }

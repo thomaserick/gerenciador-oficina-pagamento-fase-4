@@ -61,7 +61,7 @@ class ProcessarPagamentoUseCaseImplTest {
         assertThat(pagamentoSalvo.getDataCriacao()).isNotNull();
         assertThat(pagamentoSalvo.getPagamentoId()).isNotNull();
 
-        verify(eventPublisher, times(1)).pagamentoRealizadoComSucesso(pagamentoSalvo);
+        verify(eventPublisher, times(1)).pagamentoAutorizado(pagamentoSalvo);
     }
 
 }

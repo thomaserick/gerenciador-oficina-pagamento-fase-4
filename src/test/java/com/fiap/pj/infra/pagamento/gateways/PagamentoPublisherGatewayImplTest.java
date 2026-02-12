@@ -1,7 +1,7 @@
 package com.fiap.pj.infra.pagamento.gateways;
 
 import com.fiap.pj.core.pagamento.domain.Pagamento;
-import com.fiap.pj.core.pagamento.domain.event.PagamentoRealizadoEvent;
+import com.fiap.pj.core.pagamento.domain.event.PagamentoEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -34,7 +34,7 @@ class PagamentoPublisherGatewayImplTest {
         Pagamento pagamento = mock(Pagamento.class);
         when(pagamento.getOrdemServicoId()).thenReturn("os-123");
 
-        publisher.pagamentoRealizadoComSucesso(pagamento);
+        publisher.pagamentoAutorizado(pagamento);
 
         ArgumentCaptor<Object> messageCaptor = ArgumentCaptor.forClass(Object.class);
         ArgumentCaptor<String> routingKeyCaptor = ArgumentCaptor.forClass(String.class);
@@ -43,9 +43,9 @@ class PagamentoPublisherGatewayImplTest {
                 .convertAndSend(routingKeyCaptor.capture(), messageCaptor.capture());
 
         assertThat(routingKeyCaptor.getValue()).isEqualTo("fila-pagamento-processar");
-        assertThat(messageCaptor.getValue()).isInstanceOf(PagamentoRealizadoEvent.class);
+        assertThat(messageCaptor.getValue()).isInstanceOf(PagamentoEvent.class);
 
-        PagamentoRealizadoEvent event = (PagamentoRealizadoEvent) messageCaptor.getValue();
+        PagamentoEvent event = (PagamentoEvent) messageCaptor.getValue();
         assertThat(event.ordemServicoId()).isEqualTo("os-123");
     }
 }

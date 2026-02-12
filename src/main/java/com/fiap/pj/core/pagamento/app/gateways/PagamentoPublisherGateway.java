@@ -4,5 +4,7 @@ import com.fiap.pj.core.pagamento.domain.Pagamento;
 
 public interface PagamentoPublisherGateway {
 
-    void pagamentoRealizadoComSucesso(Pagamento pagamento);
+    void pagamentoAutorizado(Pagamento pagamento);
+
+    void pagamentoNaoAturizado(Pagamento pagamento);
 }

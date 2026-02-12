@@ -45,7 +45,9 @@ public class ProcessarPagamentoUseCaseImpl implements ProcessarPagamentoUseCase 
         pagamentoGateway.save(pagamento);
 
         if (pagamento.getStatusPagamento() == StatusPagamento.AUTORIZADO) {
-            eventPublisher.pagamentoRealizadoComSucesso(pagamento);
+            eventPublisher.pagamentoAutorizado(pagamento);
+        } else {
+            eventPublisher.pagamentoNaoAturizado(pagamento);
         }
 
     }
