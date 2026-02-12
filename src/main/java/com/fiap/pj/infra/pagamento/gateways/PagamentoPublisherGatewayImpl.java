@@ -22,7 +22,10 @@ public class PagamentoPublisherGatewayImpl implements PagamentoPublisherGateway 
 
     @Override
     public void pagamentoRealizadoComSucesso(Pagamento pagamento) {
-        var message = new PagamentoRealizadoEvent(pagamento.getOrdemServicoId());
-        rabbitTemplate.convertAndSend(routingKey, message);
+        var event = new PagamentoRealizadoEvent(pagamento.getOrdemServicoId());
+        rabbitTemplate.convertAndSend(routingKey, event, message -> {
+            message.getMessageProperties().setHeader("userId", pagamento.getCriadoPor());
+            return message;
+        });
     }
 }

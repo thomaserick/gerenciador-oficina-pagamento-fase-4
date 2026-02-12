@@ -57,7 +57,7 @@ class ProcessarPagamentoUseCaseImplTest {
         assertThat(pagamentoSalvo.getMetodoPagamento()).isEqualTo(cmd.getMetodoPagamento());
         assertThat(pagamentoSalvo.getQuantidadeParcelas()).isEqualTo(cmd.getQuantidadeParcelas());
         assertThat(pagamentoSalvo.getStatusPagamento()).isEqualTo(StatusPagamento.AUTORIZADO);
-        assertThat(pagamentoSalvo.getCriadoPor()).isEqualTo(cmd.getResponsavel());
+        assertThat(pagamentoSalvo.getCriadoPor()).isEqualTo(cmd.getUsuarioId());
         assertThat(pagamentoSalvo.getDataCriacao()).isNotNull();
         assertThat(pagamentoSalvo.getPagamentoId()).isNotNull();
 

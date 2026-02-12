@@ -209,14 +209,14 @@ Para testar localmente com RabbitMQ, siga os passos abaixo:
 
 ```json
 {
-  "ordemServicoId": "OS-2026-000123",
+  "ordemServicoId": "1a6d1b0e-d7ba-4ffc-a496-0beae40cb236",
   "clienteId": "CLI-984512",
   "valor": 1500.00,
   "desconto": 100.00,
   "valorTotal": 1400.00,
   "metodoPagamento": "CARTAO_CREDITO",
   "quantidadeParcelas": 3,
-  "responasvel": "Thomas Erick"
+  "usuarioId": "ed9ab88e-e2ea-416a-bce5-a93d7c7b8e5b"
 }
 ```
 

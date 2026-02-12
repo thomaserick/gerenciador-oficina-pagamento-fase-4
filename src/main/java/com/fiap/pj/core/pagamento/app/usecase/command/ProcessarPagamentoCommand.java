@@ -17,7 +17,7 @@ public class ProcessarPagamentoCommand {
     private final BigDecimal valorTotal;
     private final MetodoPagamento metodoPagamento;
     private final Integer quantidadeParcelas;
-    private final String responsavel;
+    private final String usuarioId;
 
 }
 

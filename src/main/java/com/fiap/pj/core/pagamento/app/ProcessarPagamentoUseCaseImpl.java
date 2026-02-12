@@ -27,7 +27,7 @@ public class ProcessarPagamentoUseCaseImpl implements ProcessarPagamentoUseCase 
     public void handle(ProcessarPagamentoCommand cmd) {
         //Logica para processar o pagamento de api externa
         //Simulando pagamento autorizado
-        
+
         var pagamento = Pagamento.builder()
                 .pagamentoId(UUID.randomUUID().toString())
                 .ordemServicoId(cmd.getOrdemServicoId())
@@ -38,7 +38,7 @@ public class ProcessarPagamentoUseCaseImpl implements ProcessarPagamentoUseCase 
                 .metodoPagamento(cmd.getMetodoPagamento())
                 .quantidadeParcelas(cmd.getQuantidadeParcelas())
                 .statusPagamento(StatusPagamento.AUTORIZADO)
-                .criadoPor(cmd.getResponsavel())
+                .criadoPor(cmd.getUsuarioId())
                 .dataCriacao(DateTimeUtils.getNow()
                         .toString())
                 .build();
