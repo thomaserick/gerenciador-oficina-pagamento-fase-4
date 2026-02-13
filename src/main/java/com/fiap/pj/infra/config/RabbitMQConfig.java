@@ -14,11 +14,19 @@ public class RabbitMQConfig {
 
 
     @Value("${broker.queue.pagamento.autorizado}")
-    private String queuePagamento;
+    private String queuePagamentoAutorizado;
+
+    @Value("${broker.queue.pagamento.naoautorizado}")
+    private String queuePagamentoNaoAutorizado;
 
     @Bean
-    public Queue queuePagamento() {
-        return new Queue(queuePagamento, true);
+    public Queue queuePagamentoNaoAutorizado() {
+        return new Queue(queuePagamentoNaoAutorizado, true);
+    }
+
+    @Bean
+    public Queue queuePagamentoAutorizado() {
+        return new Queue(queuePagamentoAutorizado, true);
     }
 
     @Value("${broker.queue.pagamento.processar}")

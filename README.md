@@ -24,7 +24,7 @@ relacionadas às ordens de serviço integrado o Mercado Pago.
 - **Java 17+** - Linguagem principal
 - **Spring Boot 3.3** - Framework backend
 - **JPA/Hibernate**
-- **PostgreSQL** - Banco de dados
+- **DynamoDB** - Banco de dados
 - **Docker** - Containerização
 - **Flyway** - Migrações de banco
 - **OpenAPI/Swagger** - Documentação APIs
@@ -106,7 +106,7 @@ Realiza o deploy automático no AWS EKS:
 - Configura credenciais da AWS `(via AWS_ACCESS_KEY_ID_DEV e AWS_SECRET_ACCESS_KEY_DEV)`.
 - Instala e configura o kubectl.
 - Atualiza o kubeconfig para o cluster EKS
-- Obtém automaticamente o endpoint do banco RDS e substitui no `ConfigMap`
+- Configurar o banco de dados DynamoDb na AWS
 - Executa o script `./devops/scripts/deploy-prod-k8s.sh
 ` para aplicar as configurações Kubernetes.
 
@@ -122,26 +122,22 @@ Cada arquivo tem uma função específica dentro do fluxo de deploy e operação
 devops/
 ├─ k8s/
 │   └─ prod/
-│       ├─ configmap.yaml
 │       ├─ deployment.yaml
 │       ├─ hpa.yaml
 │       ├─ namespace.yaml  
 │       ├─ service.yaml
-│       ├─ postgres-secret.yaml
 │       └─ services.yaml
 └─ scripts/
     └─ deploy-prod-k8s.sh
 ```
 
-| Arquivo                  | Descrição                                                                                                                                                                                                  |
-|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **namespace.yaml**       | Define o namespace onde os recursos da aplicação serão criados (isola o ambiente no cluster).                                                                                                              |
-| **configmap.yaml**       | Contém variáveis de configuração da aplicação, incluindo o endpoint do RDS                                                                                                                                 |
-| **postgres-secret.yaml** | Armazena de forma segura as credenciais de acesso ao banco de dados PostgreSQL (usuário e senha).                                                                                                          |
-| **deployment.yaml**      | Define como o container da aplicação é executado — imagem Docker, réplicas, volumes e variáveis de ambiente.                                                                                               |
-| **services.yaml**        | Expõe o deployment internamente ou externamente via LoadBalancer, tornando a aplicação acessível.                                                                                                          |
-| **hpa.yaml**             | Configura o **Horizontal Pod Autoscaler**, responsável por escalar os pods automaticamente conforme CPU/memória.                                                                                           |
-| **deploy-prod-k8s.sh**   | Script automatizado utilizado no pipeline de CI/CD para aplicar todos os manifests ( `kubectl apply -f`) no cluster EKS. Também atualiza o `ConfigMap` com o endpoint mais recente do RDS antes do deploy. |
+| Arquivo                | Descrição                                                                                                                                                                                                  |
+|------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **namespace.yaml**     | Define o namespace onde os recursos da aplicação serão criados (isola o ambiente no cluster).                                                                                                              |
+| **deployment.yaml**    | Define como o container da aplicação é executado — imagem Docker, réplicas, volumes e variáveis de ambiente.                                                                                               |
+| **services.yaml**      | Expõe o deployment internamente ou externamente via LoadBalancer, tornando a aplicação acessível.                                                                                                          |
+| **hpa.yaml**           | Configura o **Horizontal Pod Autoscaler**, responsável por escalar os pods automaticamente conforme CPU/memória.                                                                                           |
+| **deploy-prod-k8s.sh** | Script automatizado utilizado no pipeline de CI/CD para aplicar todos os manifests ( `kubectl apply -f`) no cluster EKS. Também atualiza o `ConfigMap` com o endpoint mais recente do RDS antes do deploy. |
 
 ## ⚙️ Instalação Local
 
@@ -165,8 +161,8 @@ devops/
 #### Pré-requisitos
 
 - **Java** 17+
-- **PostgreSQL** para banco de dados
 - **Maven** para gerenciar as dependências do projeto
+- [**LocalStack**](https://www.localstack.cloud/) para gerenciar o banco de dados DynamoDB
 
 #### Comandos
 
@@ -232,7 +228,8 @@ em um repositório separado para facilitar a manutenção e o CI/CD.
 | ☸️ **Kubernetes Infrastructure**  | Infraestrutura da aplicação no Kubernetes, incluindo manifests, deployments, ingress e autoscaling.     | [gerenciador-oficina-k8s-infra-fase-4](https://github.com/thomaserick/gerenciador-oficina-k8s-infra-fase-4)     |
 | 🗄️ **Database Infrastructure**   | Infraestrutura do banco de dados gerenciado (RDS PostgreSQL), versionada e automatizada via Terraform.  | [gerenciador-oficina-db-infra-fase-4](https://github.com/thomaserick/gerenciador-oficina-db-infra-fase-4)       |
 | 🌐 **API Gateway Infrastructure** | Infraestrutura do API Gateway com rate limiting, redirecionamento e monitoramento via Terraform.        | [gerenciador-oficina-api-gateway-infra-fase-4](https://github.com/CaioMC/gerenciador-oficina-gateway-fase-3)    |
-| ✉️ **Notificação**                | Módulo responsável pelo envio e gerenciamento de notificações                                           | [gerenciador-oficina-notificacao-fase-4](https://github.com/thomaserick/gerenciador-oficina-notificacao-fase-4) |                                                                    
+| ✉️ **Notificação**                | Módulo responsável pelo envio e gerenciamento de notificações                                           | [gerenciador-oficina-notificacao-fase-4](https://github.com/thomaserick/gerenciador-oficina-notificacao-fase-4) |
+| 💲 **Pagamento**                  | Módulo responsável pelo envio e gerenciamento de Pagamentos                                             | [gerenciador-oficina-pagamento-fase-4](https://github.com/thomaserick/gerenciador-oficina-pagamento-fase-4)     |
 
 > 🔍 Cada repositório é autônomo, mas integra-se ao **Core** por meio de pipelines e configurações declarativas (
 > Terraform e CI/CD).
