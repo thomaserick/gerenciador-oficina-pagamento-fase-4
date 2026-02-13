@@ -16,9 +16,9 @@ relacionadas às ordens de serviço integrado o Mercado Pago.
 - [Tecnologias](#-tecnologias)
 - [CI/CD Pipeline](#-cicd-pipeline--github-actions)
 - [Kubernetes (EKS)](#-kubernetes-eks)
+- [Monitoramento e Observabilidade](#-monitoramento-e-observabilidade-com-new-relic)
 - [Instalação Local](#-instalação-local)
 - [Repositórios Relacionados](#-repositórios-relacionados--fase-4)
-- [Monitoramento e Observabilidade](#-monitoramento-e-observabilidade-com-new-relic)
 
 ## 🛠 Tecnologias
 
