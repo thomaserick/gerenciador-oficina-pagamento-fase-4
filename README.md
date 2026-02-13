@@ -18,6 +18,7 @@ relacionadas às ordens de serviço integrado o Mercado Pago.
 - [Kubernetes (EKS)](#-kubernetes-eks)
 - [Instalação Local](#-instalação-local)
 - [Repositórios Relacionados](#-repositórios-relacionados--fase-4)
+- [Monitoramento e Observabilidade](#-monitoramento-e-observabilidade-com-new-relic)
 
 ## 🛠 Tecnologias
 
@@ -146,6 +147,25 @@ devops/
 | **services.yaml**      | Expõe o deployment internamente ou externamente via LoadBalancer, tornando a aplicação acessível.                                                                                                          |
 | **hpa.yaml**           | Configura o **Horizontal Pod Autoscaler**, responsável por escalar os pods automaticamente conforme CPU/memória.                                                                                           |
 | **deploy-prod-k8s.sh** | Script automatizado utilizado no pipeline de CI/CD para aplicar todos os manifests ( `kubectl apply -f`) no cluster EKS. Também atualiza o `ConfigMap` com o endpoint mais recente do RDS antes do deploy. |
+
+## 📊 Monitoramento e Observabilidade com New Relic
+
+Este projeto utiliza o New Relic para garantir observabilidade completa da aplicação, permitindo monitorar performance,
+saúde, consumo de recursos e falhas operacionais em tempo real.
+
+### Visão Geral (APM)
+
+![New Relic APM Overview](docs/assets/monitoramento/apm-overview-1.png)
+![New Relic APM Overview](docs/assets/monitoramento/apm-overview-2.png)
+
+### 🚨 Alertas
+
+Alertas são configurados no New Relic para:
+
+- Aumento anormal de latência.
+- Falhas no processamento das mensagens de pagamento.
+- Indisponibilidade dos healthchecks.
+- Consumo excessivo de CPU ou memória no Kubernetes.
 
 ## ⚙️ Instalação Local
 
