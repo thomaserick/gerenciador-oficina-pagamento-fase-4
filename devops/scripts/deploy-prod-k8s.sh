@@ -16,9 +16,6 @@ kubectl get namespace $NAMESPACE || kubectl apply -f $K8S_PATH/namespace.yaml
 echo "Aplicando secrets..."
 kubectl apply -f $K8S_PATH/newrelic-secret.yaml -n $NAMESPACE
 
-echo "Aplicando configmap..."
-kubectl apply -f $K8S_PATH/configmap.yaml -n $NAMESPACE
-
 echo "Subindo aplicação Spring Boot..."
 kubectl apply -f $K8S_PATH/deployment.yaml -n $NAMESPACE
 
