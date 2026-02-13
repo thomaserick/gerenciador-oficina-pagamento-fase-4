@@ -5,6 +5,7 @@ import com.fiap.pj.core.pagamento.domain.event.PagamentoEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,29 +24,59 @@ class PagamentoPublisherGatewayImplTest {
         rabbitTemplate = mock(RabbitTemplate.class);
         publisher = new PagamentoPublisherGatewayImpl(rabbitTemplate);
 
-        // injeta o valor da routingKey via reflexão (já que @Value não é processado no teste unitário puro)
         var routingKeyField = PagamentoPublisherGatewayImpl.class.getDeclaredField("routingKey");
         routingKeyField.setAccessible(true);
         routingKeyField.set(publisher, "fila-pagamento-processar");
+
+        var routingKeyNaoAutorizadoField =
+                PagamentoPublisherGatewayImpl.class.getDeclaredField("routingKeyNaoAutorizado");
+        routingKeyNaoAutorizadoField.setAccessible(true);
+        routingKeyNaoAutorizadoField.set(publisher, "fila-pagamento-nao-autorizado");
     }
 
     @Test
-    void devePublicarEventoDePagamentoComSucesso() throws Exception {
+    void devePublicarEventoDePagamentoComSucesso() {
         Pagamento pagamento = mock(Pagamento.class);
         when(pagamento.getOrdemServicoId()).thenReturn("os-123");
+        when(pagamento.getCriadoPor()).thenReturn("user-1");
+
+        ArgumentCaptor<String> routingKeyCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object> messageCaptor = ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<MessagePostProcessor> postProcessorCaptor =
+                ArgumentCaptor.forClass(MessagePostProcessor.class);
 
         publisher.pagamentoAutorizado(pagamento);
 
-        ArgumentCaptor<Object> messageCaptor = ArgumentCaptor.forClass(Object.class);
-        ArgumentCaptor<String> routingKeyCaptor = ArgumentCaptor.forClass(String.class);
-
         verify(rabbitTemplate, times(1))
-                .convertAndSend(routingKeyCaptor.capture(), messageCaptor.capture());
+                .convertAndSend(routingKeyCaptor.capture(), messageCaptor.capture(), postProcessorCaptor.capture());
 
         assertThat(routingKeyCaptor.getValue()).isEqualTo("fila-pagamento-processar");
         assertThat(messageCaptor.getValue()).isInstanceOf(PagamentoEvent.class);
 
         PagamentoEvent event = (PagamentoEvent) messageCaptor.getValue();
         assertThat(event.ordemServicoId()).isEqualTo("os-123");
+    }
+
+    @Test
+    void devePublicarEventoDePagamentoNaoAutorizadoComSucesso() {
+        Pagamento pagamento = mock(Pagamento.class);
+        when(pagamento.getOrdemServicoId()).thenReturn("os-999");
+        when(pagamento.getCriadoPor()).thenReturn("user-erro");
+
+        ArgumentCaptor<String> routingKeyCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object> messageCaptor = ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<MessagePostProcessor> postProcessorCaptor =
+                ArgumentCaptor.forClass(MessagePostProcessor.class);
+
+        publisher.pagamentoNaoAturizado(pagamento);
+
+        verify(rabbitTemplate, times(1))
+                .convertAndSend(routingKeyCaptor.capture(), messageCaptor.capture(), postProcessorCaptor.capture());
+
+        assertThat(routingKeyCaptor.getValue()).isEqualTo("fila-pagamento-nao-autorizado");
+        assertThat(messageCaptor.getValue()).isInstanceOf(PagamentoEvent.class);
+
+        PagamentoEvent event = (PagamentoEvent) messageCaptor.getValue();
+        assertThat(event.ordemServicoId()).isEqualTo("os-999");
     }
 }
