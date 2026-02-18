@@ -2,6 +2,7 @@ package com.fiap.pj.infra.pagamento.controller.dto;
 
 import com.fiap.pj.core.pagamento.domain.MetodoPagamento;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -48,7 +49,12 @@ public record ProcessarPagamentoRequest(
         Integer quantidadeParcelas,
 
         @Schema(description = "ID do usuário que está realizando o pagamento", example = "user-teste")
-        String usuarioId
+        String usuarioId,
+
+        @Schema(description = "Dados do cartão para processamento do pagamento")
+        @Valid
+        @NotNull(message = "dadosCartao é obrigatório")
+        DadosCartaoRequest dadosCartao
 ) {
 
     /**

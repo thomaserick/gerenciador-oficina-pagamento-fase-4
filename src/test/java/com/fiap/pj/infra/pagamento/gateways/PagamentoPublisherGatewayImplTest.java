@@ -8,6 +8,8 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -36,8 +38,9 @@ class PagamentoPublisherGatewayImplTest {
 
     @Test
     void devePublicarEventoDePagamentoComSucesso() {
+        UUID ordemServicoId = UUID.randomUUID();
         Pagamento pagamento = mock(Pagamento.class);
-        when(pagamento.getOrdemServicoId()).thenReturn("os-123");
+        when(pagamento.getOrdemServicoId()).thenReturn(ordemServicoId.toString());
         when(pagamento.getCriadoPor()).thenReturn("user-1");
 
         ArgumentCaptor<String> routingKeyCaptor = ArgumentCaptor.forClass(String.class);
@@ -54,13 +57,14 @@ class PagamentoPublisherGatewayImplTest {
         assertThat(messageCaptor.getValue()).isInstanceOf(PagamentoEvent.class);
 
         PagamentoEvent event = (PagamentoEvent) messageCaptor.getValue();
-        assertThat(event.ordemServicoId()).isEqualTo("os-123");
+        assertThat(event.ordemServicoId()).isEqualTo(ordemServicoId);
     }
 
     @Test
     void devePublicarEventoDePagamentoNaoAutorizadoComSucesso() {
+        UUID ordemServicoId = UUID.randomUUID();
         Pagamento pagamento = mock(Pagamento.class);
-        when(pagamento.getOrdemServicoId()).thenReturn("os-999");
+        when(pagamento.getOrdemServicoId()).thenReturn(ordemServicoId.toString());
         when(pagamento.getCriadoPor()).thenReturn("user-erro");
 
         ArgumentCaptor<String> routingKeyCaptor = ArgumentCaptor.forClass(String.class);
@@ -77,6 +81,6 @@ class PagamentoPublisherGatewayImplTest {
         assertThat(messageCaptor.getValue()).isInstanceOf(PagamentoEvent.class);
 
         PagamentoEvent event = (PagamentoEvent) messageCaptor.getValue();
-        assertThat(event.ordemServicoId()).isEqualTo("os-999");
+        assertThat(event.ordemServicoId()).isEqualTo(ordemServicoId);
     }
 }

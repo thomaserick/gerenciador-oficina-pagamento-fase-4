@@ -33,7 +33,7 @@ class PagamentoConsumerTest {
         @DisplayName("Deve processar evento de pagamento recebido da fila")
         void deveProcessarEventoPagamentoRecebidoDaFila() {
             // Arrange
-            PagamentoProcessadoEvent event = criarEventoPagamento();
+            PagamentoProcessadoEvent event = criarEventoPagamentoSemCartao();
 
             // Act
             consumer.receiveMessage(event);
@@ -69,7 +69,8 @@ class PagamentoConsumerTest {
                     cmd.getValorTotal().compareTo(BigDecimal.valueOf(90)) == 0 &&
                     cmd.getMetodoPagamento() == MetodoPagamento.CARTAO_CREDITO &&
                     cmd.getQuantidadeParcelas() == 3 &&
-                    cmd.getUsuarioId().equals("usuario-teste")
+                    cmd.getUsuarioId().equals("usuario-teste") &&
+                    cmd.getDadosCartao() == null // Sem dados de cartão no evento legado
             ));
         }
 
@@ -120,9 +121,62 @@ class PagamentoConsumerTest {
                     cmd.getQuantidadeParcelas() == null
             ));
         }
+
+        @Test
+        @DisplayName("Deve mapear dados do cartão quando presentes no evento")
+        void deveMapearDadosCartaoQuandoPresentesNoEvento() {
+            // Arrange
+            PagamentoProcessadoEvent event = new PagamentoProcessadoEvent(
+                    "os-cartao",
+                    "cliente-cartao",
+                    BigDecimal.valueOf(150),
+                    BigDecimal.ZERO,
+                    BigDecimal.valueOf(150),
+                    MetodoPagamento.CARTAO_CREDITO,
+                    3,
+                    "usuario-teste",
+                    "5031433215406351",
+                    "123",
+                    11,
+                    2030,
+                    "JOAO DA SILVA",
+                    "19119119100",
+                    "joao@email.com"
+            );
+
+            // Act
+            consumer.receiveMessage(event);
+
+            // Assert
+            verify(processarPagamentoUseCase).handle(argThat(cmd ->
+                    cmd.getDadosCartao() != null &&
+                    cmd.getDadosCartao().getNumeroCartao().equals("5031433215406351") &&
+                    cmd.getDadosCartao().getCodigoSeguranca().equals("123") &&
+                    cmd.getDadosCartao().getMesExpiracao() == 11 &&
+                    cmd.getDadosCartao().getAnoExpiracao() == 2030 &&
+                    cmd.getDadosCartao().getNomeTitular().equals("JOAO DA SILVA") &&
+                    cmd.getDadosCartao().getCpfTitular().equals("19119119100") &&
+                    cmd.getDadosCartao().getEmailTitular().equals("joao@email.com")
+            ));
+        }
+
+        @Test
+        @DisplayName("Deve retornar dados cartão nulo quando evento não possui dados do cartão")
+        void deveRetornarDadosCartaoNuloQuandoEventoSemDadosCartao() {
+            // Arrange
+            PagamentoProcessadoEvent event = criarEventoPagamentoSemCartao();
+
+            // Act
+            consumer.receiveMessage(event);
+
+            // Assert
+            verify(processarPagamentoUseCase).handle(argThat(cmd ->
+                    cmd.getDadosCartao() == null
+            ));
+        }
     }
 
-    private PagamentoProcessadoEvent criarEventoPagamento() {
+    private PagamentoProcessadoEvent criarEventoPagamentoSemCartao() {
         return new PagamentoProcessadoEvent(
                 "os-test",
                 "cliente-test",

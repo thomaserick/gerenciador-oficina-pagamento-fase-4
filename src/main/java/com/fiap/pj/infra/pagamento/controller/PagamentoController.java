@@ -3,6 +3,7 @@ package com.fiap.pj.infra.pagamento.controller;
 import com.fiap.pj.core.pagamento.app.usecase.BuscarPagamentoUseCase;
 import com.fiap.pj.core.pagamento.app.usecase.ProcessarPagamentoUseCase;
 import com.fiap.pj.core.pagamento.app.usecase.command.ProcessarPagamentoCommand;
+import com.fiap.pj.core.pagamento.domain.DadosCartao;
 import com.fiap.pj.core.pagamento.domain.Pagamento;
 import com.fiap.pj.infra.pagamento.controller.dto.ProcessarPagamentoRequest;
 import com.fiap.pj.infra.pagamento.controller.dto.ProcessarPagamentoResponse;
@@ -11,7 +12,13 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -37,6 +44,8 @@ public class PagamentoController implements PagamentoControllerOpenApi {
         log.info("Recebida requisição de teste de pagamento. OS: {}, Valor: {}",
                 request.ordemServicoId(), request.valorTotal());
 
+        DadosCartao dadosCartao = ProcessarPagamentoCommand.mapearDadosCartao(request.dadosCartao());
+
         ProcessarPagamentoCommand command = new ProcessarPagamentoCommand(
                 request.ordemServicoId(),
                 request.clienteId(),
@@ -45,7 +54,8 @@ public class PagamentoController implements PagamentoControllerOpenApi {
                 request.valorTotal(),
                 request.metodoPagamento(),
                 request.getParcelasOuUma(),
-                request.getUsuarioOuSistema()
+                request.getUsuarioOuSistema(),
+                dadosCartao
         );
 
         this.processarPagamentoUseCase.handle(command);
@@ -53,7 +63,6 @@ public class PagamentoController implements PagamentoControllerOpenApi {
         Pagamento pagamentoProcessado = this.buscarPagamentoUseCase.handle(request.ordemServicoId());
 
         log.info("Pagamento de teste processado. OS: {}, Status: {}", pagamentoProcessado.getOrdemServicoId(), pagamentoProcessado.getStatusPagamento());
-
         return ProcessarPagamentoResponse.fromPagamento(pagamentoProcessado);
     }
 }

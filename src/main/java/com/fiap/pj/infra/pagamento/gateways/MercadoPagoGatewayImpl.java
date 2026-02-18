@@ -1,6 +1,7 @@
 package com.fiap.pj.infra.pagamento.gateways;
 
 import com.fiap.pj.core.pagamento.app.gateways.MercadoPagoGateway;
+import com.fiap.pj.core.pagamento.domain.DadosCartao;
 import com.fiap.pj.core.pagamento.domain.Pagamento;
 import com.fiap.pj.core.pagamento.domain.StatusPagamento;
 import com.fiap.pj.core.pagamento.domain.exception.MercadoPagoIntegrationException;
@@ -87,28 +88,21 @@ public class MercadoPagoGatewayImpl implements MercadoPagoGateway {
      */
     @Override
     public Pagamento processarPagamento(Pagamento pagamento) {
-        log.info("Iniciando processamento de pagamento no Mercado Pago. OS: {}, Método: {}, Valor: {}",
-                pagamento.getOrdemServicoId(),
-                pagamento.getMetodoPagamento(),
-                pagamento.getValorTotal());
+        log.info("Iniciando processamento de pagamento no Mercado Pago. OS: {}, Método: {}, Valor: {}", pagamento.getOrdemServicoId(), pagamento.getMetodoPagamento(), pagamento.getValorTotal());
 
         this.garantirChaveIdempotencia(pagamento);
 
         try {
-            String cardToken = this.gerarTokenCartaoTeste();
+            DadosCartao dadosCartao = this.obterDadosCartao(pagamento);
+            String cardToken = this.gerarTokenCartao(dadosCartao);
 
-            PaymentCreateRequest request = this.criarRequisicaoPagamentoCartao(pagamento, cardToken);
+            PaymentCreateRequest request = this.criarRequisicaoPagamentoCartao(pagamento, cardToken, dadosCartao);
             MPRequestOptions options = this.configurarRequisicaoIntegracao(pagamento.getChaveIdempotencia());
 
             Payment response = this.executarPagamento(request, options);
-
             this.atualizarPagamentoComResposta(pagamento, response);
 
-            log.info("Pagamento processado com sucesso. TransacaoId: {}, Status: {}, OS: {}",
-                    pagamento.getTransacaoId(),
-                    pagamento.getStatusPagamento(),
-                    pagamento.getOrdemServicoId());
-
+            log.info("Pagamento processado com sucesso. TransacaoId: {}, Status: {}, OS: {}", pagamento.getTransacaoId(), pagamento.getStatusPagamento(), pagamento.getOrdemServicoId());
         } catch (MercadoPagoIntegrationException e) {
             log.error("Erro na integração com Mercado Pago. OS: {}, Código: {}, Mensagem: {}", pagamento.getOrdemServicoId(), e.getCodigoErro(), e.getMessage());
             this.atualizarPagamentoComFalha(pagamento, e.getCodigoErro(), e.getMessage());
@@ -140,15 +134,40 @@ public class MercadoPagoGatewayImpl implements MercadoPagoGateway {
     }
 
     /**
-     * Gera token do cartão de teste Mastercard para ambiente sandbox usando API REST.
+     * Obtém os dados do cartão do pagamento ou utiliza os dados de teste padrão.
      *
+     * @param pagamento objeto contendo os dados do pagamento
+     * @return dados do cartão para processamento
+     */
+    private DadosCartao obterDadosCartao(Pagamento pagamento) {
+        if (pagamento.getDadosCartao() != null && pagamento.getDadosCartao().isPreenchido()) {
+            log.debug("Utilizando dados do cartão informados pelo cliente");
+            return pagamento.getDadosCartao();
+        }
+
+        log.debug("Utilizando dados do cartão de teste padrão (Sandbox)");
+        return DadosCartao.builder()
+                .numeroCartao(TEST_CARD_NUMBER)
+                .codigoSeguranca(TEST_CARD_SECURITY_CODE)
+                .mesExpiracao(TEST_CARD_EXPIRATION_MONTH)
+                .anoExpiracao(TEST_CARD_EXPIRATION_YEAR)
+                .nomeTitular(TEST_CARD_HOLDER_NAME)
+                .cpfTitular(DEFAULT_SANDBOX_CPF)
+                .emailTitular(DEFAULT_SANDBOX_EMAIL)
+                .build();
+    }
+
+    /**
+     * Gera token do cartão para ambiente sandbox usando API REST.
+     *
+     * @param dadosCartao dados do cartão
      * @return ID do token do cartão
      * @throws MercadoPagoIntegrationException se houver erro na geração do token
      */
-    private String gerarTokenCartaoTeste() throws MercadoPagoIntegrationException {
-        log.debug("Gerando token do cartão de teste Mastercard");
+    private String gerarTokenCartao(DadosCartao dadosCartao) throws MercadoPagoIntegrationException {
+        log.debug("Gerando token do cartão");
 
-        String jsonBody = this.criarCorpoRequisicaoToken();
+        String jsonBody = this.criarCorpoRequisicaoToken(dadosCartao);
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -182,28 +201,28 @@ public class MercadoPagoGatewayImpl implements MercadoPagoGateway {
     /**
      * Cria o corpo da requisição para geração do token do cartão.
      */
-    private String criarCorpoRequisicaoToken() {
+    private String criarCorpoRequisicaoToken(DadosCartao dadosCartao) {
         return String.format("""
-            {
-                "card_number": "%s",
-                "security_code": "%s",
-                "expiration_month": %d,
-                "expiration_year": %d,
-                "cardholder": {
-                    "name": "%s",
-                    "identification": {
-                        "type": "CPF",
-                        "number": "%s"
-                    }
-                }
-            }
-            """,
-            TEST_CARD_NUMBER,
-            TEST_CARD_SECURITY_CODE,
-            TEST_CARD_EXPIRATION_MONTH,
-            TEST_CARD_EXPIRATION_YEAR,
-            TEST_CARD_HOLDER_NAME,
-            DEFAULT_SANDBOX_CPF
+                        {
+                            "card_number": "%s",
+                            "security_code": "%s",
+                            "expiration_month": %d,
+                            "expiration_year": %d,
+                            "cardholder": {
+                                "name": "%s",
+                                "identification": {
+                                    "type": "CPF",
+                                    "number": "%s"
+                                }
+                            }
+                        }
+                        """,
+                dadosCartao.getNumeroCartao(),
+                dadosCartao.getCodigoSeguranca(),
+                dadosCartao.getMesExpiracao(),
+                dadosCartao.getAnoExpiracao(),
+                dadosCartao.getNomeTitular(),
+                dadosCartao.getCpfTitular()
         );
     }
 
@@ -233,14 +252,14 @@ public class MercadoPagoGatewayImpl implements MercadoPagoGateway {
     /**
      * Cria a requisição de pagamento com cartão de crédito.
      */
-    private PaymentCreateRequest criarRequisicaoPagamentoCartao(Pagamento pagamento, String cardToken) {
+    private PaymentCreateRequest criarRequisicaoPagamentoCartao(Pagamento pagamento, String cardToken, DadosCartao dadosCartao) {
         return PaymentCreateRequest.builder()
                 .transactionAmount(pagamento.getValorTotal())
                 .description("Pagamento Ordem de Servico: " + pagamento.getOrdemServicoId())
                 .paymentMethodId("master")
                 .token(cardToken)
                 .installments(this.obterQuantidadeParcelas(pagamento))
-                .payer(this.criarPayerRequest())
+                .payer(this.criarPayerRequest(dadosCartao))
                 .externalReference(pagamento.getPagamentoId())
                 .build();
     }
@@ -255,14 +274,18 @@ public class MercadoPagoGatewayImpl implements MercadoPagoGateway {
     /**
      * Cria o objeto de dados do pagador para a requisição.
      */
-    private PaymentPayerRequest criarPayerRequest() {
+    private PaymentPayerRequest criarPayerRequest(DadosCartao dadosCartao) {
+        String email = dadosCartao.getEmailTitular() != null && !dadosCartao.getEmailTitular().isBlank()
+                ? dadosCartao.getEmailTitular()
+                : DEFAULT_SANDBOX_EMAIL;
+
         return PaymentPayerRequest.builder()
-                .email(DEFAULT_SANDBOX_EMAIL)
+                .email(email)
                 .firstName(DEFAULT_SANDBOX_FIRST_NAME)
                 .lastName(DEFAULT_SANDBOX_LAST_NAME)
                 .identification(com.mercadopago.client.common.IdentificationRequest.builder()
                         .type("CPF")
-                        .number(DEFAULT_SANDBOX_CPF)
+                        .number(dadosCartao.getCpfTitular())
                         .build())
                 .build();
     }

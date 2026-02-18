@@ -72,6 +72,7 @@ public class ProcessarPagamentoUseCaseImpl implements ProcessarPagamentoUseCase 
                 .statusPagamento(StatusPagamento.PENDENTE)
                 .criadoPor(cmd.getUsuarioId())
                 .dataCriacao(DateTimeUtils.getNow().toString())
+                .dadosCartao(cmd.getDadosCartao())
                 .build();
     }
 

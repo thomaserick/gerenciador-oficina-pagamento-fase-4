@@ -32,4 +32,10 @@ public class Pagamento {
     private String chaveIdempotencia;
     private String criadoPor;
 
+    /**
+     * Dados do cartão para processamento do pagamento.
+     * <p><b>IMPORTANTE:</b> Este campo NÃO deve ser persistido.</p>
+     */
+    private DadosCartao dadosCartao;
+
 }

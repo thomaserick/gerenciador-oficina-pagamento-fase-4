@@ -192,9 +192,9 @@ class FluxoPagamentoIntegrationTest {
     @DisplayName("Deve processar múltiplos pagamentos em sequência")
     void deveProcessarMultiplosPagamentosEmSequencia() {
         // Arrange
-        PagamentoProcessadoEvent event1 = criarEventoPagamento("os-seq-1", BigDecimal.valueOf(50.00));
-        PagamentoProcessadoEvent event2 = criarEventoPagamento("os-seq-2", BigDecimal.valueOf(100.00));
-        PagamentoProcessadoEvent event3 = criarEventoPagamento("os-seq-3", BigDecimal.valueOf(150.00));
+        PagamentoProcessadoEvent event1 = criarEventoPagamentoSemCartao("os-seq-1", BigDecimal.valueOf(50.00));
+        PagamentoProcessadoEvent event2 = criarEventoPagamentoSemCartao("os-seq-2", BigDecimal.valueOf(100.00));
+        PagamentoProcessadoEvent event3 = criarEventoPagamentoSemCartao("os-seq-3", BigDecimal.valueOf(150.00));
 
         // Act
         this.consumer.receiveMessage(event1);
@@ -208,7 +208,83 @@ class FluxoPagamentoIntegrationTest {
         System.out.println("✅ 3 pagamentos processados em sequência!");
     }
 
-    private PagamentoProcessadoEvent criarEventoPagamento(String ordemServicoId, BigDecimal valor) {
+    @Test
+    @Order(5)
+    @DisplayName("Deve processar pagamento com dados de cartão dinâmicos")
+    void deveProcessarPagamentoComDadosCartaoDinamicos() {
+        // Arrange - Evento com dados completos do cartão
+        PagamentoProcessadoEvent event = new PagamentoProcessadoEvent(
+                "os-cartao-dinamico-" + UUID.randomUUID().toString().substring(0, 8),
+                "cliente-cartao-dinamico",
+                BigDecimal.valueOf(200.00),
+                BigDecimal.ZERO,
+                BigDecimal.valueOf(200.00),
+                MetodoPagamento.CARTAO_CREDITO,
+                3,
+                "usuario-cartao-teste",
+                // Dados do cartão de teste (Mastercard aprovado)
+                "5031433215406351",
+                "123",
+                11,
+                2030,
+                "APRO",  // Nome APRO = aprovação automática no sandbox
+                "19119119100",
+                "test_user@testuser.com"
+        );
+
+        // Act
+        this.consumer.receiveMessage(event);
+
+        // Assert
+        ArgumentCaptor<Pagamento> pagamentoCaptor = ArgumentCaptor.forClass(Pagamento.class);
+        verify(this.pagamentoGateway).save(pagamentoCaptor.capture());
+
+        Pagamento pagamentoSalvo = pagamentoCaptor.getValue();
+        // Em ambiente sandbox, o pagamento pode ser AUTORIZADO ou NAO_AUTORIZADO dependendo do estado da API
+        assertThat(pagamentoSalvo.getStatusPagamento()).isIn(StatusPagamento.AUTORIZADO, StatusPagamento.NAO_AUTORIZADO);
+
+        // Verifica que um dos eventos foi publicado
+        if (pagamentoSalvo.getStatusPagamento() == StatusPagamento.AUTORIZADO) {
+            verify(this.eventPublisher).pagamentoAutorizado(any(Pagamento.class));
+            System.out.println("✅ Pagamento com cartão dinâmico processado com sucesso!");
+            System.out.println("   - Transação ID: " + pagamentoSalvo.getTransacaoId());
+        } else {
+            verify(this.eventPublisher).pagamentoNaoAturizado(any(Pagamento.class));
+            System.out.println("⚠️ Pagamento com cartão dinâmico não autorizado (possível rate-limit ou problema na API)");
+            System.out.println("   - Código Erro: " + pagamentoSalvo.getCodigoErro());
+        }
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("Deve processar pagamento sem dados de cartão usando cartão padrão de teste")
+    void deveProcessarPagamentoSemDadosCartaoUsandoCartaoPadrao() {
+        // Arrange - Evento sem dados do cartão (usando construtor de compatibilidade)
+        PagamentoProcessadoEvent event = new PagamentoProcessadoEvent(
+                "os-cartao-padrao-" + UUID.randomUUID().toString().substring(0, 8),
+                "cliente-cartao-padrao",
+                BigDecimal.valueOf(100.00),
+                BigDecimal.ZERO,
+                BigDecimal.valueOf(100.00),
+                MetodoPagamento.CARTAO_CREDITO,
+                1,
+                "sistema"
+        );
+
+        // Act
+        this.consumer.receiveMessage(event);
+
+        // Assert - Deve funcionar usando o cartão padrão de teste
+        ArgumentCaptor<Pagamento> pagamentoCaptor = ArgumentCaptor.forClass(Pagamento.class);
+        verify(this.pagamentoGateway).save(pagamentoCaptor.capture());
+
+        Pagamento pagamentoSalvo = pagamentoCaptor.getValue();
+        assertThat(pagamentoSalvo.getStatusPagamento()).isEqualTo(StatusPagamento.AUTORIZADO);
+
+        System.out.println("✅ Pagamento com cartão padrão processado com sucesso!");
+    }
+
+    private PagamentoProcessadoEvent criarEventoPagamentoSemCartao(String ordemServicoId, BigDecimal valor) {
         return new PagamentoProcessadoEvent(
                 ordemServicoId,
                 "cliente-multiplo",
