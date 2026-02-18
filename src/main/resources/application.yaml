@@ -71,6 +71,9 @@ broker:
       naoautorizado: default.pagamento.nao-autorizado
       processar: default.pagamento.processar
 
+mercadopago:
+  public-key: ${MERCADO_PAGO_PUBLIC_KEY:TEST-b119b7dd-037a-43a9-afe3-bfdfe8d2ef3f}
+  access-token: ${MERCADO_PAGO_ACCESS_TOKEN:TEST-4604387371249325-021610-a9360cf42beb4662ed601e25048d2adb-376051986}
 
 server:
   port: 8083

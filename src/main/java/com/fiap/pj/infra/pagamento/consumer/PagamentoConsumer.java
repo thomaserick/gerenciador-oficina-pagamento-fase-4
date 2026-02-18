@@ -18,8 +18,17 @@ public class PagamentoConsumer {
 
     @RabbitListener(queues = "${broker.queue.pagamento.processar}")
     public void receiveMessage(PagamentoProcessadoEvent message) {
-        var cmd = new ProcessarPagamentoCommand(message.ordemServicoId(), message.clienteId(), message.valor(),
-                message.desconto(), message.valorTotal(), message.metodoPagamento(), message.quantidadeParcelas(), message.usuarioId());
-        processarPagamentoUseCase.handle(cmd);
+        var cmd = new ProcessarPagamentoCommand(
+                message.ordemServicoId(),
+                message.clienteId(),
+                message.valor(),
+                message.desconto(),
+                message.valorTotal(),
+                message.metodoPagamento(),
+                message.quantidadeParcelas(),
+                message.usuarioId()
+        );
+
+        this.processarPagamentoUseCase.handle(cmd);
     }
 }

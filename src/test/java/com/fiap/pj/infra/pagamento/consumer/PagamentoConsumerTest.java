@@ -1,53 +1,138 @@
 package com.fiap.pj.infra.pagamento.consumer;
 
 import com.fiap.pj.core.pagamento.app.usecase.ProcessarPagamentoUseCase;
-import com.fiap.pj.core.pagamento.app.usecase.command.ProcessarPagamentoCommand;
 import com.fiap.pj.core.pagamento.domain.MetodoPagamento;
 import com.fiap.pj.core.pagamento.domain.event.PagamentoProcessadoEvent;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
+@DisplayName("PagamentoConsumer")
 class PagamentoConsumerTest {
 
-    @Test
-    void deveChamarUseCaseComCommandCorretoAoReceberMensagem() {
-        ProcessarPagamentoUseCase useCase = mock(ProcessarPagamentoUseCase.class);
-        PagamentoConsumer consumer = new PagamentoConsumer(useCase);
+    private ProcessarPagamentoUseCase processarPagamentoUseCase;
+    private PagamentoConsumer consumer;
 
-        PagamentoProcessadoEvent event = new PagamentoProcessadoEvent(
-                "os-123",
-                "cli-456",
-                new BigDecimal("100.00"),
-                new BigDecimal("10.00"),
-                new BigDecimal("90.00"),
+    @BeforeEach
+    void setUp() {
+        this.processarPagamentoUseCase = mock(ProcessarPagamentoUseCase.class);
+        this.consumer = new PagamentoConsumer(this.processarPagamentoUseCase);
+    }
+
+    @Nested
+    @DisplayName("Recepção de mensagens")
+    class RecepcaoMensagens {
+
+        @Test
+        @DisplayName("Deve processar evento de pagamento recebido da fila")
+        void deveProcessarEventoPagamentoRecebidoDaFila() {
+            // Arrange
+            PagamentoProcessadoEvent event = criarEventoPagamento();
+
+            // Act
+            consumer.receiveMessage(event);
+
+            // Assert
+            verify(processarPagamentoUseCase, times(1)).handle(any());
+        }
+
+        @Test
+        @DisplayName("Deve mapear corretamente os dados do evento para o comando")
+        void deveMapearCorretamenteDadosDoEventoParaComando() {
+            // Arrange
+            PagamentoProcessadoEvent event = new PagamentoProcessadoEvent(
+                    "os-123",
+                    "cliente-456",
+                    BigDecimal.valueOf(100),
+                    BigDecimal.valueOf(10),
+                    BigDecimal.valueOf(90),
+                    MetodoPagamento.CARTAO_CREDITO,
+                    3,
+                    "usuario-teste"
+            );
+
+            // Act
+            consumer.receiveMessage(event);
+
+            // Assert
+            verify(processarPagamentoUseCase).handle(argThat(cmd ->
+                    cmd.getOrdemServicoId().equals("os-123") &&
+                    cmd.getClienteId().equals("cliente-456") &&
+                    cmd.getValor().compareTo(BigDecimal.valueOf(100)) == 0 &&
+                    cmd.getDesconto().compareTo(BigDecimal.valueOf(10)) == 0 &&
+                    cmd.getValorTotal().compareTo(BigDecimal.valueOf(90)) == 0 &&
+                    cmd.getMetodoPagamento() == MetodoPagamento.CARTAO_CREDITO &&
+                    cmd.getQuantidadeParcelas() == 3 &&
+                    cmd.getUsuarioId().equals("usuario-teste")
+            ));
+        }
+
+        @Test
+        @DisplayName("Deve processar evento com cartão de débito")
+        void deveProcessarEventoComCartaoDebito() {
+            // Arrange
+            PagamentoProcessadoEvent event = new PagamentoProcessadoEvent(
+                    "os-789",
+                    "cliente-012",
+                    BigDecimal.valueOf(50),
+                    BigDecimal.ZERO,
+                    BigDecimal.valueOf(50),
+                    MetodoPagamento.CARTAO_DEBITO,
+                    1,
+                    "sistema"
+            );
+
+            // Act
+            consumer.receiveMessage(event);
+
+            // Assert
+            verify(processarPagamentoUseCase).handle(argThat(cmd ->
+                    cmd.getMetodoPagamento() == MetodoPagamento.CARTAO_DEBITO
+            ));
+        }
+
+        @Test
+        @DisplayName("Deve processar evento sem parcelas (valor nulo)")
+        void deveProcessarEventoSemParcelas() {
+            // Arrange
+            PagamentoProcessadoEvent event = new PagamentoProcessadoEvent(
+                    "os-999",
+                    "cliente-888",
+                    BigDecimal.valueOf(200),
+                    BigDecimal.ZERO,
+                    BigDecimal.valueOf(200),
+                    MetodoPagamento.CARTAO_CREDITO,
+                    null,
+                    "usuario"
+            );
+
+            // Act
+            consumer.receiveMessage(event);
+
+            // Assert
+            verify(processarPagamentoUseCase).handle(argThat(cmd ->
+                    cmd.getQuantidadeParcelas() == null
+            ));
+        }
+    }
+
+    private PagamentoProcessadoEvent criarEventoPagamento() {
+        return new PagamentoProcessadoEvent(
+                "os-test",
+                "cliente-test",
+                BigDecimal.valueOf(100),
+                BigDecimal.TEN,
+                BigDecimal.valueOf(90),
                 MetodoPagamento.CARTAO_CREDITO,
-                3,
-                "user-1"
+                1,
+                "sistema-teste"
         );
-
-        consumer.receiveMessage(event);
-
-        ArgumentCaptor<ProcessarPagamentoCommand> cmdCaptor =
-                ArgumentCaptor.forClass(ProcessarPagamentoCommand.class);
-
-        verify(useCase, times(1)).handle(cmdCaptor.capture());
-
-        ProcessarPagamentoCommand cmd = cmdCaptor.getValue();
-
-        Assertions.assertEquals("os-123", cmd.getOrdemServicoId());
-        Assertions.assertEquals(new BigDecimal("100.00"), cmd.getValor());
-        Assertions.assertEquals(new BigDecimal("10.00"), cmd.getDesconto());
-        Assertions.assertEquals(new BigDecimal("90.00"), cmd.getValorTotal());
-        Assertions.assertEquals(MetodoPagamento.CARTAO_CREDITO, cmd.getMetodoPagamento());
-        Assertions.assertEquals(3, cmd.getQuantidadeParcelas());
-        Assertions.assertEquals("user-1", cmd.getUsuarioId());
-
     }
 }
+
