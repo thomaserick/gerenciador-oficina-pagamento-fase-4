@@ -1,4 +1,6 @@
 package com.fiap.pj.core.pagamento.domain.event;
 
-public record PagamentoEvent(String ordemServicoId) {
+import java.util.UUID;
+
+public record PagamentoEvent(UUID ordemServicoId) {
 }

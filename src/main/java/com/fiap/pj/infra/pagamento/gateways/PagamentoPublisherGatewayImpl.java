@@ -7,6 +7,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 
 @Component
 public class PagamentoPublisherGatewayImpl implements PagamentoPublisherGateway {
@@ -25,8 +27,8 @@ public class PagamentoPublisherGatewayImpl implements PagamentoPublisherGateway 
 
     @Override
     public void pagamentoAutorizado(Pagamento pagamento) {
-        var event = new PagamentoEvent(pagamento.getOrdemServicoId());
-        rabbitTemplate.convertAndSend(routingKey, event, message -> {
+        var event = new PagamentoEvent(UUID.fromString(pagamento.getOrdemServicoId()));
+        this.rabbitTemplate.convertAndSend(routingKey, event, message -> {
             message.getMessageProperties().setHeader("userId", pagamento.getCriadoPor());
             return message;
         });
@@ -34,12 +36,10 @@ public class PagamentoPublisherGatewayImpl implements PagamentoPublisherGateway 
 
     @Override
     public void pagamentoNaoAturizado(Pagamento pagamento) {
-        var event = new PagamentoEvent(pagamento.getOrdemServicoId());
-        rabbitTemplate.convertAndSend(routingKeyNaoAutorizado, event, message -> {
+        var event = new PagamentoEvent(UUID.fromString(pagamento.getOrdemServicoId()));
+        this.rabbitTemplate.convertAndSend(routingKeyNaoAutorizado, event, message -> {
             message.getMessageProperties().setHeader("userId", pagamento.getCriadoPor());
             return message;
         });
     }
-
-
 }
