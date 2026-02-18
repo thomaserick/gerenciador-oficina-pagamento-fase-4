@@ -23,7 +23,7 @@ public class DynamoConfig {
         if (StringUtils.isNotBlank(endpoint)) {
             builder.endpointOverride(java.net.URI.create(endpoint));
         }
+
         return builder.build();
     }
-
 }

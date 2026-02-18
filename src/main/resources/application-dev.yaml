@@ -1,3 +1,28 @@
+# =====================================================
+# Configurações para ambiente de desenvolvimento LOCAL
+# Usar: SPRING_PROFILES_ACTIVE=dev
+# =====================================================
+
+# AWS Real (DynamoDB)
 aws:
-  dynamodb:
-    endpoint: http://localhost:4566
+  region:
+    static: ${AWS_REGION:us-east-1}
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID:test}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:test}
+
+# RabbitMQ Local (sobrescreve o addresses do application.yaml)
+spring:
+  rabbitmq:
+    addresses: ""
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+
+# Logs detalhados para desenvolvimento
+logging:
+  level:
+    com.fiap.pj: DEBUG
+    org.springframework.amqp: DEBUG
+
