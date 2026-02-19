@@ -152,7 +152,7 @@ jobs:
           sed -i "s|\${AWS_ACCESS_KEY_ID}|${AWS_ACCESS_KEY_ID}|g" ./devops/k8s/prod/aws-secret.yaml
           sed -i "s|\${AWS_SECRET_ACCESS_KEY}|${AWS_SECRET_ACCESS_KEY}|g" ./devops/k8s/prod/aws-secret.yaml
 
-      # 🔹 Deploy no Kubernetes
+      # 🔹 Deploy no Kubernetess
       - name: Deploy to EKS
         run: |
           chmod +x ./devops/scripts/deploy-prod-k8s.sh
