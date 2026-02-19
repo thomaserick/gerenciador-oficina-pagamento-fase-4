@@ -142,11 +142,15 @@ jobs:
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --region ${{env.AWS_REGION}} --name ${{ env.CLUSTER_NAME }}
 
-      - name: Substituir variáveis do Secret SMTP
+      - name: Substituir variáveis do Secret
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          sed -i "s|\${NEW_RELIC_LICENSE_KEY}|${NEW_RELIC_LICENSE_KEY}|g" ./devops/k8s/prod/newrelic-secret.yaml    
+          sed -i "s|\${NEW_RELIC_LICENSE_KEY}|${NEW_RELIC_LICENSE_KEY}|g" ./devops/k8s/prod/newrelic-secret.yaml
+          sed -i "s|\${AWS_ACCESS_KEY_ID}|${AWS_ACCESS_KEY_ID}|g" ./devops/k8s/prod/aws-secret.yaml
+          sed -i "s|\${AWS_SECRET_ACCESS_KEY}|${AWS_SECRET_ACCESS_KEY}|g" ./devops/k8s/prod/aws-secret.yaml
 
       # 🔹 Deploy no Kubernetes
       - name: Deploy to EKS
