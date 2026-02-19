@@ -41,8 +41,7 @@ public class PagamentoController implements PagamentoControllerOpenApi {
     @PostMapping("/integracao-mercado-pago/teste")
     @ResponseStatus(HttpStatus.OK)
     public ProcessarPagamentoResponse testarPagamento(@Valid @RequestBody ProcessarPagamentoRequest request) {
-        log.info("Recebida requisição de teste de pagamento. OS: {}, Valor: {}",
-                request.ordemServicoId(), request.valorTotal());
+        log.info("Recebida requisição de teste de pagamento. OS: {}, Valor: {}", request.ordemServicoId(), request.valorTotal());
 
         DadosCartao dadosCartao = ProcessarPagamentoCommand.mapearDadosCartao(request.dadosCartao());
 

@@ -38,7 +38,7 @@ public class PagamentoPublisherGatewayImpl implements PagamentoPublisherGateway 
     public void pagamentoNaoAturizado(Pagamento pagamento) {
         var event = new PagamentoEvent(UUID.fromString(pagamento.getOrdemServicoId()));
         this.rabbitTemplate.convertAndSend(routingKeyNaoAutorizado, event, message -> {
-            message.getMessageProperties().setHeader("userId", pagamento.getCriadoPor());
+                message.getMessageProperties().setHeader("userId", pagamento.getCriadoPor());
             return message;
         });
     }
